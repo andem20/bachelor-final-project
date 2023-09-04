@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mammogram analysis</title>
+    <script src="./public/js/main.js"></script>
+    <link rel="stylesheet" href="./public/css/main.css">
+    <link rel="stylesheet" href="./public/css/spinner.css">
+</head>
+
+<body>
+    <div class="header">
+        <div class="title">Mammogram Analysis</div>
+        <input type="file" id="image_upload" class="file_chooser" accept="image/png, image/jpeg, .dcm" />
+        ROI confidence threshold
+        <select name="confidence" id="confidence"></select>
+    </div>
+    <div class="container">
+        <div class="preview_container">
+            <div class="ground_truth">Prediction</div>
+            <div class="preview_container" id="preview_container" style="height: 90%;"></div>
+        </div>
+        <div class="preview_container" style="text-align: right;">
+            <div class="ground_truth">Ground Truth</div>
+            <img id="image_container" src="">
+        </div>
+    </div>
+
+    <script>
+        const input = document.querySelector("input")
+        const output = document.querySelector("output")
+        let imagesArray = []
+        const previewContainer = document.getElementById("preview_container")
+        const confidenceSelector = document.getElementById("confidence")
+        const imageContainer = document.getElementById("image_container")
+        
+        let confidence = 10
+
+        for(let i = 0; i < 10; i++) {
+            const option = document.createElement("option")
+            option.value = confidence / 100
+            option.innerHTML = confidence / 100
+            confidence += 5
+            option.defaultSelected = option.value == 0.3
+
+            confidenceSelector.appendChild(option)
+        }
+
+
+        input.addEventListener("click", () => {
+            input.value = null
+        });
+
+        input.addEventListener("change", async () => {
+            imageContainer.style.opacity = 0
+            const file = input.files[0]
+            const fileParts = file.name.split(".")
+
+            await handleImageUpload(file, previewContainer, confidenceSelector)
+            imageContainer.src = `./public/assets/examples/${fileParts[0]}_mask.${fileParts[1]}`
+            imageContainer.onload = function() {
+                imageContainer.style.opacity = 1
+            }
+        })
+    </script>
+</body>
+
+</html>
